@@ -78,10 +78,10 @@ async def health(): return {"status":"ok","execution":"locked"}
 async def login(): return LOGIN
 
 @app.post("/login")
-async def do_login(username: str=Form(...), password: str=Form(...)):
+async def do_login(request: Request, username: str=Form(...), password: str=Form(...)):
     if not (hmac.compare_digest(username,DASHBOARD_USER) and hmac.compare_digest(password,DASHBOARD_PASSWORD)):
         raise HTTPException(401,"invalid credentials")
-    r=RedirectResponse("/",status_code=303); return r
+    request.session["auth"]=True; r=RedirectResponse("/",status_code=303); return r
 
 @app.get("/logout")
 async def logout(request: Request):
@@ -119,4 +119,4 @@ async def merge_pr(request: Request):
 @app.post("/api/authorize-at3")
 async def authorize_at3(request: Request):
     auth(request)
-    return await gh("POST",f"/repos/{REPO}/issues/2/comments",json={"body":"HUMAN_APPROVAL: AT-3\nApproved via Control Dashboard by repository owner.\nExecution authority: NONE. This approval authorizes only the AT-3 engineering phase to be proposed/implemented under the existing safety gates."})
+    return await gh("POST",f"/repos/{REPO}/issues/5/comments",json={"body":"HUMAN_APPROVAL: AT-3\nApproved via Control Dashboard by repository owner.\nExecution authority: NONE. This approval authorizes only the AT-3 engineering phase to be proposed/implemented under the existing safety gates."})
