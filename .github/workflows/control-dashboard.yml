@@ -1,0 +1,24 @@
+name: Control Dashboard Validation
+
+on:
+  push:
+    branches: [main, control-dashboard-v1]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m py_compile dashboard/app.py
+      - run: python - <<'PY'
+          import ast
+          from pathlib import Path
+          ast.parse(Path("dashboard/app.py").read_text())
+          print("dashboard syntax PASS")
+        PY
