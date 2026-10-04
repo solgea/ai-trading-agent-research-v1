@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 import pytest
+from pydantic import ValidationError
 
 from ai_trading_agent.contracts.agent import AgentEvent, AgentRole
-from ai_trading_agent.eventing import EventBus, EventBusError, Replay, ReplayError, ResearchMemory, ResearchMemoryError, MemoryMode
+from ai_trading_agent.eventing import EventBus, EventBusError, Replay, ResearchMemory, ResearchMemoryError, MemoryMode
 
 
 def event(*, correlation_id=None, task_id=None, causation_id=None, event_id=None, n="0"):
@@ -36,7 +37,7 @@ def test_AT2_002_event_immutability():
     bus = EventBus()
     e = event()
     bus.publish(e)
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError, match="Instance is frozen"):
         e.event_type = "MUTATED"
     assert bus.get(str(e.event_id)).event_type == "TEST.EVENT"
 
