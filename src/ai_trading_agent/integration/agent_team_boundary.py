@@ -64,8 +64,9 @@ class AgentTeamBoundary:
     @staticmethod
     def reject_bypass(action: str) -> None:
         forbidden = {"RISK_GATE_BYPASS", "APPROVAL_BYPASS", "DIRECT_EXECUTION", "EXECUTE", "LLM_EXECUTE"}
-        if action in forbidden:
-            raise AgentTeamBoundaryError(f"forbidden agent action: {action}")
+        if action not in forbidden:
+            raise AgentTeamBoundaryError(f"unknown agent action rejected fail-closed: {action}")
+        raise AgentTeamBoundaryError(f"forbidden agent action: {action}")
 
     @staticmethod
     def execution_boundary(intent: TradeIntent, approval: Approval, fill: OrderFilled | None) -> OrderFilled:
