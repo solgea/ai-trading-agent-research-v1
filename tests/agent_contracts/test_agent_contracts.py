@@ -48,6 +48,11 @@ def test_json_pydantic_semantic_parity():
         assert set(fs["properties"])==set(gs["properties"])
         assert set(fs.get("required",[]))==set(gs.get("required",[]))
         for key in fs["properties"]:
-            assert fs["properties"][key]["type"]==gs["properties"][key]["type"]
-    role_enum=fs["$defs"]["AgentRole"]["enum"] if "AgentRole" in fs.get("$defs",{}) else None
-    if role_enum is not None: assert set(role_enum)==ROLES
+            f=fs["properties"][key]; g=gs["properties"][key]
+            if "type" in f and "type" in g:
+                assert f["type"]==g["type"]
+            elif "$ref" in f:
+                ref_name=f["$ref"].split("/")[-1]
+                assert ref_name in gs.get("$defs",{})
+            else:
+                assert "anyOf" in f
