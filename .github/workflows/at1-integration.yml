@@ -2,6 +2,8 @@ name: AT-1 Agent Teams Frozen Core Integration
 on:
   push:
     branches: [main, at1-agent-teams-frozen-core]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 jobs:
   at1:
