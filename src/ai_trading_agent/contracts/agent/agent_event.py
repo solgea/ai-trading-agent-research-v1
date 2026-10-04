@@ -3,7 +3,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 from .agent_role import AgentRole
 class AgentEvent(BaseModel):
-    model_config=ConfigDict(extra="forbid")
+    model_config=ConfigDict(extra="forbid", frozen=True)
     event_id:UUID
     event_type:str=Field(min_length=1,max_length=128)
     schema_version:str=Field(min_length=1,max_length=32)
