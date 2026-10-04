@@ -1,0 +1,19 @@
+name: AT-2 Event Bus Replay Memory
+
+on:
+  push:
+    branches: [main, at2-event-bus-replay-memory]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  at2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[dev]"
+      - run: pytest -q tests/agent_contracts tests/core tests/at1 tests/at2
