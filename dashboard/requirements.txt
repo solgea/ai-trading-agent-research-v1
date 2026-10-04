@@ -1,1 +1,5 @@
-fastapi==0.115.12\nuvicorn[standard]==0.34.0\nhttpx==0.28.1\npython-multipart==0.0.20\nitsdangerous==2.2.0\n
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+httpx==0.28.1
+python-multipart==0.0.20
+itsdangerous==2.2.0
