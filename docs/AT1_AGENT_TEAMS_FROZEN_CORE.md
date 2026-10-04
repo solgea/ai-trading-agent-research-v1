@@ -1,6 +1,6 @@
 # AT-1 — Agent Teams ↔ Frozen Core Integration
 
-Status: IMPLEMENTED — pending CI freeze gate.
+Status: IMPLEMENTED — CI gate requested and pending result visibility.
 
 ## Boundary
 Agent Teams are contract-driven orchestration/research actors. Frozen Core remains the sole authority for TradeIntent → RiskGate → Approval → ExecutionPort → OrderFilled.
