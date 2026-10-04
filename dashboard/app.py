@@ -81,7 +81,7 @@ async def login(): return LOGIN
 async def do_login(username: str=Form(...), password: str=Form(...)):
     if not (hmac.compare_digest(username,DASHBOARD_USER) and hmac.compare_digest(password,DASHBOARD_PASSWORD)):
         raise HTTPException(401,"invalid credentials")
-    r=RedirectResponse("/",status_code=303); r.set_cookie("dashboard_login","1",httponly=True,secure=True,samesite="lax"); return r
+    r=RedirectResponse("/",status_code=303); return r
 
 @app.get("/logout")
 async def logout(request: Request):
@@ -98,7 +98,7 @@ async def state(request: Request):
     prs=await gh("GET",f"/repos/{REPO}/pulls",params={"state":"open","per_page":20})
     issues=await gh("GET",f"/repos/{REPO}/issues",params={"state":"all","per_page":12,"sort":"updated","direction":"desc"})
     runs=await gh("GET",f"/repos/{REPO}/actions/runs",params={"per_page":12})
-    comments=await gh("GET",f"/repos/{REPO}/issues/2/comments",params={"per_page":50}) if REPO=="solgea/ai-trading-agent-research-v1" else []
+    comments=await gh("GET",f"/repos/{REPO}/issues/5/comments",params={"per_page":50}) if REPO=="solgea/ai-trading-agent-research-v1" else []
     at3=any("HUMAN_APPROVAL: AT-3" in c.get("body","") for c in comments)
     return {"repo":{"full_name":repo["full_name"],"default_branch_sha":(await gh("GET",f"/repos/{REPO}/git/ref/heads/{repo['default_branch']}"))["object"]["sha"]},
             "open_prs":[{"number":p["number"],"title":p["title"],"draft":p["draft"],"head_sha":p["head"]["sha"]} for p in prs],
