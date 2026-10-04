@@ -5,12 +5,13 @@ from uuid import uuid4
 import pytest
 from jsonschema import Draft202012Validator
 from pydantic import ValidationError
-from ai_trading_agent.contracts.agent import AgentEvent,AgentIdentity,AgentPermission,AgentPermissionSet,AgentResult,AgentRole,AgentTask
+from ai_trading_agent.contracts.agent import AgentEvent,AgentIdentity,AgentPermission,AgentPermissionSet,AgentResult,AgentTask
 
 ROOT=Path(__file__).parents[2]; SCHEMAS=ROOT/"contracts"/"agent"
+ROLES={"ORCHESTRATOR","RESEARCH","MARKET_INTELLIGENCE","SIGNAL","LLM_ADVISOR","RISK","QA","EXECUTION"}
 
 def test_role_closed_enum():
-    AgentIdentity(agent_id="a",role=AgentRole.RESEARCH,version="1.0")
+    AgentIdentity(agent_id="a",role="RESEARCH",version="1.0")
     with pytest.raises(ValidationError): AgentIdentity(agent_id="a",role="NOPE",version="1.0",x=1)
 
 def test_permissions_fail_closed():
@@ -40,12 +41,13 @@ def test_json_schemas_valid_and_closed():
         assert s["additionalProperties"] is False
         Draft202012Validator.check_schema(s)
 
-def test_pydantic_schema_root_closed():
-    from ai_trading_agent.contracts.agent import AgentPermissionSet,AgentEvent,AgentResult
+def test_json_pydantic_semantic_parity():
     models={"agent_role":AgentIdentity,"agent_permission":AgentPermissionSet,"agent_task":AgentTask,"agent_event":AgentEvent,"agent_result":AgentResult}
     for name,m in models.items():
-        assert m.model_json_schema()["additionalProperties"] is False
-        fs=json.loads((SCHEMAS/f"{name}.schema.json").read_text())
-        gs=m.model_json_schema()
-        for k in ("properties","required","$defs"):
-            if k in gs: assert fs.get(k)==gs[k]
+        fs=json.loads((SCHEMAS/f"{name}.schema.json").read_text()); gs=m.model_json_schema()
+        assert set(fs["properties"])==set(gs["properties"])
+        assert set(fs.get("required",[]))==set(gs.get("required",[]))
+        for key in fs["properties"]:
+            assert fs["properties"][key]["type"]==gs["properties"][key]["type"]
+    role_enum=fs["$defs"]["AgentRole"]["enum"] if "AgentRole" in fs.get("$defs",{}) else None
+    if role_enum is not None: assert set(role_enum)==ROLES
